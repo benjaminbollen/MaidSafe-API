@@ -30,6 +30,7 @@
 #include "maidsafe/common/tagged_value.h"
 #include "maidsafe/common/types.h"
 #include "maidsafe/passport/passport.h"
+#include "maidsafe/drive/tools/launcher.h"
 
 #include "maidsafe/session_handler.h"
 
@@ -55,6 +56,8 @@ struct AnonymousSession {
   // Move-constructible and move-assignable only
   AnonymousSession(AnonymousSession&& other);
   AnonymousSession& operator=(AnonymousSession other);
+
+  drive::Options GetOptions();
 
   std::unique_ptr<passport::Passport> passport;
   boost::posix_time::ptime timestamp;

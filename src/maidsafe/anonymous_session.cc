@@ -60,6 +60,15 @@ AnonymousSession& AnonymousSession::operator=(AnonymousSession other) {
   return *this;
 }
 
+drive::Options AnonymousSession::GetOptions() {
+  drive::Options options;
+  options.peer_endpoint = ip.to_string() + ":" + std::to_string(port);
+  options.unique_id = unique_user_id;
+  options.root_parent_id = root_parent_id;
+  options.passport = passport->Serialise().string();
+  return options;
+}
+
 AnonymousSession::SerialisedType AnonymousSession::Serialise() {
   protobuf::AnonymousSession proto_session;
   proto_session.set_serialised_passport(passport->Serialise().string());
