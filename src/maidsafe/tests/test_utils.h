@@ -1,4 +1,4 @@
-/*  Copyright 2014 MaidSafe.net limited
+/*  Copyright 2012 MaidSafe.net limited
 
     This MaidSafe Software is licensed to you under (1) the MaidSafe.net Commercial License,
     version 1.0 or later, or (2) The General Public License (GPL), version 3, depending on which
@@ -16,30 +16,27 @@
     See the Licences for the specific language governing permissions and limitations relating to
     use of the MaidSafe Software.                                                                 */
 
-#include "maidsafe/detail/session_getter.h"
+#ifndef MAIDSAFE_TESTS_TEST_UTILS_H_
+#define MAIDSAFE_TESTS_TEST_UTILS_H_
 
-#include "maidsafe/common/test.h"
+#include <string>
+#include <tuple>
 
-#include "maidsafe/routing/parameters.h"
+#include "maidsafe/common/authentication/user_credentials.h"
 
 namespace maidsafe {
 
-namespace detail {
-
 namespace test {
 
-// Pre-condition : Need a Vault network running
+std::tuple<std::string, uint32_t, std::string> GetRandomUserCredentialsTuple();
 
-TEST(SessionGetterTest, FUNC_Constructor) {
-  routing::Parameters::append_local_live_port_endpoint = true;
-  BootstrapInfo bootstrap_info;
-  {
-     SessionGetter session_getter(bootstrap_info);
-  }
-}
+authentication::UserCredentials GetRandomUserCredentials();
+
+authentication::UserCredentials MakeUserCredentials(
+    const std::tuple<std::string, uint32_t, std::string>& credentials_tuple);
 
 }  // namespace test
 
-}  // namespace detail
-
 }  // namespace maidsafe
+
+#endif  // MAIDSAFE_TESTS_TEST_UTILS_H_

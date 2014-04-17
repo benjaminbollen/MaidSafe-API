@@ -18,10 +18,11 @@
 
 
 #include "maidsafe/detail/client_impl.h"
-#include "maidsafe/common/log.h"
 
 #include <string>
 #include <vector>
+
+#include "maidsafe/common/log.h"
 
 namespace maidsafe {
 
@@ -39,27 +40,29 @@ ClientImpl::ClientImpl(const passport::Maid& maid, const BootstrapInfo& bootstra
       asio_service_(2) {
   passport::PublicPmid::Name pmid_name;  // FIXME
   maid_node_nfs_.reset(new nfs_client::MaidNodeNfs(asio_service_, routing_, pmid_name));
-  InitRouting(bootstrap_info);  // FIXME need to update routing to get bootstrap endpoints along with public keys
+  // FIXME need to update routing to get bootstrap endpoints along with public keys
+  InitRouting(bootstrap_info);
   LOG(kInfo) << "Routing Initialised";
 }
 
-ClientImpl::ClientImpl(const passport::Maid& maid, const passport::Anmaid& anmaid,
+ClientImpl::ClientImpl(const passport::MaidAndSigner& maid_and_signer,
                        const BootstrapInfo& bootstrap_info)
     : network_health_mutex_(),
       network_health_condition_variable_(),
       network_health_(-1),
       network_health_change_signal_(),
-      maid_(maid),
+      maid_(maid_and_signer.first),
       routing_(maid_),
       maid_node_nfs_(),  // deferred construction until asio service is created
       public_pmid_helper_(),
       asio_service_(2) {
   passport::PublicPmid::Name pmid_name;  // FIXME to be filled in by vault registration
   maid_node_nfs_.reset(new nfs_client::MaidNodeNfs(asio_service_, routing_, pmid_name));
-  InitRouting(bootstrap_info);  // FIXME need to update routing to get bootstrap endpoints along with public keys
+  // FIXME need to update routing to get bootstrap endpoints along with public keys
+  InitRouting(bootstrap_info);
   LOG(kInfo) << " Routing Initialised";
   passport::PublicMaid public_maid(maid_);
-  passport::PublicAnmaid public_anmaid(anmaid);
+  passport::PublicAnmaid public_anmaid(maid_and_signer.second);
   LOG(kInfo) << " Calling CreateAccount for maid name :"
              << DebugId(public_maid.name());
   nfs_vault::AccountCreation account_creation(public_maid, public_anmaid);
@@ -136,9 +139,7 @@ void ClientImpl::InitRouting(const BootstrapInfo& bootstrap_info) {
   std::vector<boost::asio::ip::udp::endpoint> peer_endpoints;
   for (const auto& i : bootstrap_info)
     peer_endpoints.push_back(i.first);
-  std::cout << "Before Routing Join";
   routing_.Join(functors, peer_endpoints);
-  std::cout << "After Routing Join";
   std::unique_lock<std::mutex> lock(network_health_mutex_);
   // FIXME BEFORE_RELEASE discuss this
   // This should behave differently. In case of new maid account, it should timeout

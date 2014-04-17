@@ -31,6 +31,7 @@
 #include "maidsafe/common/data_types/mutable_data.h"
 #include "maidsafe/common/data_types/structured_data_versions.h"
 
+#include "maidsafe/passport/passport.h"
 #include "maidsafe/passport/types.h"
 
 
@@ -39,7 +40,7 @@
 
 namespace maidsafe {
 namespace test {
-  class ClientTest_BEH_RegisterVault_Test;
+  class ClientTest_FUNC_RegisterVault_Test;
 }
 
 namespace detail { class ClientImpl; }
@@ -61,8 +62,7 @@ class Client {
 
   // For new accounts
   // throws on failure to create account
-  Client(const passport::Maid& maid, const passport::Anmaid& anmaid,
-         const BootstrapInfo& bootstrap_info);
+  Client(const passport::MaidAndSigner& maid_and_signer, const BootstrapInfo& bootstrap_info);
 
   ~Client();
 
@@ -108,7 +108,7 @@ class Client {
   void DeleteBranchUntilFork(const MutableData::Name& mutable_data_name,
                              const StructuredDataVersions::VersionName& branch_tip);
 
-  friend class test::ClientTest_BEH_RegisterVault_Test;
+  friend class test::ClientTest_FUNC_RegisterVault_Test;
 
  private:
   std::unique_ptr<detail::ClientImpl> pimpl_;

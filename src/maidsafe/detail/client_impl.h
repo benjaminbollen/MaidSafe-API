@@ -30,7 +30,7 @@
 namespace maidsafe {
 
 namespace test {
-  class ClientTest_BEH_RegisterVault_Test;
+  class ClientTest_FUNC_RegisterVault_Test;
 }
 
 namespace detail {
@@ -39,8 +39,7 @@ class ClientImpl {
  public:
   ClientImpl(const passport::Maid& maid, const BootstrapInfo& bootstrap_info);
 
-  ClientImpl(const passport::Maid& maid, const passport::Anmaid& anmaid,
-             const BootstrapInfo& bootstrap_info);
+  ClientImpl(const passport::MaidAndSigner& maid_and_signer, const BootstrapInfo& bootstrap_info);
 
   Client::RegisterVaultFuture RegisterVault(const passport::Pmid& pmid,
                                             const std::chrono::steady_clock::duration& timeout);
@@ -75,7 +74,7 @@ class ClientImpl {
 
   void DeleteBranchUntilFork(const MutableData::Name& mutable_data_name,
                              const StructuredDataVersions::VersionName& branch_tip);
-  friend class test::ClientTest_BEH_RegisterVault_Test;
+  friend class test::ClientTest_FUNC_RegisterVault_Test;
 
  private:
   void InitRouting(const BootstrapInfo& bootstrap_info);
