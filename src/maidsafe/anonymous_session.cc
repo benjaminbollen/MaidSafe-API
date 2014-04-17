@@ -62,12 +62,17 @@ AnonymousSession& AnonymousSession::operator=(AnonymousSession other) {
   return *this;
 }
 
-drive::Options AnonymousSession::GetOptions() {
+drive::Options AnonymousSession::GetOptions(const crypto::AES256Key& symm_key,
+                                            const crypto::AES256InitialisationVector& symm_iv) {
   drive::Options options;
   options.peer_endpoint = ip.to_string() + ":" + std::to_string(port);
   options.unique_id = unique_user_id;
   options.root_parent_id = root_parent_id;
-  options.passport = passport->Serialise().string();
+  options.encrypted_maid = maidsafe::passport::EncryptMaid(passport->GetMaid(),
+                                                           symm_key,
+                                                           symm_iv).data.string();
+  options.symm_key = symm_key.string();
+  options.symm_iv = symm_iv.string();
   return options;
 }
 

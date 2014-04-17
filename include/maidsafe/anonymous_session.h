@@ -58,7 +58,8 @@ struct AnonymousSession {
   AnonymousSession(AnonymousSession&& other);
   AnonymousSession& operator=(AnonymousSession other);
 
-  drive::Options GetOptions();
+  drive::Options GetOptions(const crypto::AES256Key& symm_key,
+                            const crypto::AES256InitialisationVector& symm_iv);
 
   std::unique_ptr<passport::Passport> passport;
   boost::posix_time::ptime timestamp;
