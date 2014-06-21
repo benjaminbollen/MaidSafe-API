@@ -95,7 +95,57 @@ TEST(SessionHandlerTest, BEH_EncryptDecryptAnonymousSession) {
   }
 }
 
-TEST(SessionHandlerTest, FUNC_Login) {
+TEST(SessionHandlerTest, FUNC_CreateValidAccount) {
+  try {
+    routing::Parameters::append_local_live_port_endpoint = true;
+    routing::BootstrapContacts bootstrap_contacts;
+    auto user_credentials_tuple(GetRandomUserCredentialsTuple());
+    auto maid_and_signer(passport::CreateMaidAndSigner());
+    LOG(kInfo) << "SessionHandlerTest  -- Creating new account --";
+    Client client(maid_and_signer, bootstrap_contacts);
+    AnonymousSession session(maid_and_signer);
+    authentication::UserCredentials user_credentials(MakeUserCredentials(user_credentials_tuple));
+    EXPECT_NO_THROW(SessionHandler<AnonymousSession>(std::move(session), client,
+                                                     std::move(user_credentials)));
+  } catch (const std::exception& ex) {
+    LOG(kError) << "Error on CreateValidAccount : " << boost::diagnostic_information(ex);
+    ASSERT_TRUE(false);
+  }
+}
+
+TEST(SessionHandlerTest, FUNC_CreateDuplicateAccount) {
+  try {
+    routing::Parameters::append_local_live_port_endpoint = true;
+    routing::BootstrapContacts bootstrap_contacts;
+    auto user_credentials_tuple(GetRandomUserCredentialsTuple());
+    {
+      auto maid_and_signer(passport::CreateMaidAndSigner());
+      LOG(kInfo) << "SessionHandlerTest  -- Creating First account --";
+      Client client(maid_and_signer, bootstrap_contacts);
+      AnonymousSession session(maid_and_signer);
+      authentication::UserCredentials user_credentials(MakeUserCredentials(user_credentials_tuple));
+      EXPECT_NO_THROW(SessionHandler<AnonymousSession>(std::move(session), client,
+                                                       std::move(user_credentials)));
+    }
+    {
+      auto maid_and_signer(passport::CreateMaidAndSigner());
+      LOG(kInfo) << "SessionHandlerTest  -- Creating Duplicate account --";
+      Client client(maid_and_signer, bootstrap_contacts);
+      AnonymousSession session(maid_and_signer);
+      authentication::UserCredentials user_credentials(MakeUserCredentials(user_credentials_tuple));
+
+      // TODO(Prakash): Verify the error code being checked for as accurate
+      ExpectSpecificThrow([&] { SessionHandler<AnonymousSession>(std::move(session), client,
+                                                                 std::move(user_credentials)); },
+                          MakeError(VaultErrors::account_already_exists));
+    }
+  } catch (const std::exception& ex) {
+    LOG(kError) << "Error on CreateDuplicateAccount : " << boost::diagnostic_information(ex);
+    ASSERT_TRUE(false);
+  }
+}
+
+TEST(SessionHandlerTest, FUNC_ValidLogin) {
   routing::Parameters::append_local_live_port_endpoint = true;
   routing::BootstrapContacts bootstrap_contacts;
   auto user_credentials_tuple(GetRandomUserCredentialsTuple());
@@ -105,22 +155,42 @@ TEST(SessionHandlerTest, FUNC_Login) {
     Client client(maid_and_signer, bootstrap_contacts);
     AnonymousSession session(maid_and_signer);
     authentication::UserCredentials user_credentials(MakeUserCredentials(user_credentials_tuple));
-    SessionHandler<AnonymousSession> session_handler(std::move(session), client,
-                                                     std::move(user_credentials));
+    EXPECT_NO_THROW(SessionHandler<AnonymousSession>(std::move(session), client,
+                    std::move(user_credentials)));
   }
   try {
     LOG(kInfo) << "SessionHandlerTest  -- Login for existing account --";
     SessionHandler<AnonymousSession> session_handler(bootstrap_contacts);
     LOG(kInfo) << "About to Login .. ";
     authentication::UserCredentials user_credentials(MakeUserCredentials(user_credentials_tuple));
-    session_handler.Login(std::move(user_credentials));
+    EXPECT_NO_THROW(session_handler.Login(std::move(user_credentials)));
     LOG(kInfo) << "Login successful !";
     ASSERT_TRUE(maid_and_signer.first.name() ==
                 session_handler.session().passport->GetMaid().name());
-    Client client(session_handler.session().passport->GetMaid(), bootstrap_contacts);
+    EXPECT_NO_THROW(Client(session_handler.session().passport->GetMaid(), bootstrap_contacts));
     LOG(kInfo) << "Client connection to account successful !";
   } catch (std::exception& e) {
-    LOG(kError) << "Error on Login :" << boost::diagnostic_information(e);
+    LOG(kError) << "Error on ValidLogin :" << boost::diagnostic_information(e);
+    ASSERT_TRUE(false);
+  }
+}
+
+TEST(SessionHandlerTest, FUNC_InvalidLogin) {
+  routing::Parameters::append_local_live_port_endpoint = true;
+  routing::BootstrapContacts bootstrap_contacts;
+  auto user_credentials_tuple(GetRandomUserCredentialsTuple());
+  auto maid_and_signer(passport::CreateMaidAndSigner());
+  try {
+    LOG(kInfo) << "SessionHandlerTest  -- Login for invalid account --";
+    SessionHandler<AnonymousSession> session_handler(bootstrap_contacts);
+    LOG(kInfo) << "About to Login .. ";
+    authentication::UserCredentials user_credentials(MakeUserCredentials(user_credentials_tuple));
+
+    // TODO(Prakash): Verify the error code being checked for as accurate
+    ExpectSpecificThrow([&] { session_handler.Login(std::move(user_credentials)); },
+                        MakeError(VaultErrors::no_such_account));
+  } catch (std::exception& e) {
+    LOG(kError) << "Error on InvalidLogin :" << boost::diagnostic_information(e);
     ASSERT_TRUE(false);
   }
 }

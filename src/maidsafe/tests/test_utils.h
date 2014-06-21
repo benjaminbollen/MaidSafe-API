@@ -35,6 +35,10 @@ authentication::UserCredentials GetRandomUserCredentials();
 authentication::UserCredentials MakeUserCredentials(
     const std::tuple<std::string, uint32_t, std::string>& credentials_tuple);
 
+void ExpectSpecificThrow(std::function<void()> statement, const maidsafe_error& expected_exception);
+
+void AssertSpecificThrow(std::function<void()> statement, const maidsafe_error& expected_exception);
+
 }  // namespace test
 
 }  // namespace maidsafe
