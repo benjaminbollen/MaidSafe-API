@@ -22,7 +22,6 @@
 
 #include "maidsafe/common/authentication/user_credentials.h"
 #include "maidsafe/common/make_unique.h"
-#include "maidsafe/common/test.h"
 #include "maidsafe/common/utils.h"
 
 namespace maidsafe {
@@ -50,34 +49,6 @@ authentication::UserCredentials MakeUserCredentials(
   user_credentials.password = maidsafe::make_unique<authentication::UserCredentials::Password>(
           std::get<2>(user_credentials_tuple));
   return user_credentials;
-}
-
-void ExpectSpecificThrow(std::function<void()> statement,
-                         const maidsafe_error& expected_exception) {
-  try {
-    statement();
-    EXPECT_TRUE(false) << "Expected Exception: " << expected_exception.code() <<
-                          "\nActual: it throws nothing";
-  } catch (const maidsafe_error& e) {
-    EXPECT_EQ(expected_exception.code(), e.code());
-  } catch (const std::exception&) {
-    EXPECT_TRUE(false) << "Expected Exception: " << expected_exception.code() <<
-                          "\nActual: it throws a different type";
-  }
-}
-
-void AssertSpecificThrow(std::function<void()> statement,
-                         const maidsafe_error& expected_exception) {
-  try {
-    statement();
-    ASSERT_TRUE(false) << "Expected Exception: " << expected_exception.code() <<
-                          "\nActual: it throws nothing";
-  } catch (const maidsafe_error& e) {
-    ASSERT_EQ(expected_exception.code(), e.code());
-  } catch (const std::exception&) {
-    ASSERT_TRUE(false) << "Expected Exception: " << expected_exception.code() <<
-                          "\nActual: it throws a different type";
-  }
 }
 
 }  // namespace test

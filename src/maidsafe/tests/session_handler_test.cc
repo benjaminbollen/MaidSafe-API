@@ -31,10 +31,9 @@ namespace maidsafe {
 
 namespace test {
 
-
 struct TestSession {
   typedef TaggedValue<std::string, struct AnonymousSessiontag> SerialisedType;
-  SerialisedType Serialise(const authentication::UserCredentials&) {
+  SerialisedType Serialise(const authentication::UserCredentials&) const {
     return SerialisedType(session_string);
   }
 
@@ -52,7 +51,7 @@ TEST(SessionHandlerTest, FUNC_Constructor) {
   routing::BootstrapContacts bootstrap_contacts;
   LOG(kInfo) << "Session Handler for exisiting account";
   {
-     SessionHandler<AnonymousSession> session_handler(bootstrap_contacts);
+    SessionHandler<AnonymousSession> session_handler(bootstrap_contacts);
   }
 
   LOG(kInfo) << "Session Handler for new account";
@@ -107,9 +106,9 @@ TEST(SessionHandlerTest, FUNC_CreateValidAccount) {
     authentication::UserCredentials user_credentials(MakeUserCredentials(user_credentials_tuple));
     EXPECT_NO_THROW(SessionHandler<AnonymousSession>(std::move(session), client,
                                                      std::move(user_credentials)));
-  } catch (const std::exception& ex) {
-    LOG(kError) << "Error on CreateValidAccount : " << boost::diagnostic_information(ex);
-    ASSERT_TRUE(false);
+  }
+  catch (const std::exception& ex) {
+    GTEST_FAIL() << "Error on CreateValidAccount : " << boost::diagnostic_information(ex);
   }
 }
 
@@ -135,13 +134,13 @@ TEST(SessionHandlerTest, FUNC_CreateDuplicateAccount) {
       authentication::UserCredentials user_credentials(MakeUserCredentials(user_credentials_tuple));
 
       // TODO(Prakash): Verify the error code being checked for as accurate
-      ExpectSpecificThrow([&] { SessionHandler<AnonymousSession>(std::move(session), client,
-                                                                 std::move(user_credentials)); },
-                          MakeError(VaultErrors::account_already_exists));
+      EXPECT_TRUE(ThrowsAs([&] { SessionHandler<AnonymousSession>(std::move(session), client,
+                                                                  std::move(user_credentials)); },
+                           VaultErrors::account_already_exists));
     }
-  } catch (const std::exception& ex) {
-    LOG(kError) << "Error on CreateDuplicateAccount : " << boost::diagnostic_information(ex);
-    ASSERT_TRUE(false);
+  }
+  catch (const std::exception& ex) {
+    GTEST_FAIL() << "Error on CreateDuplicateAccount : " << boost::diagnostic_information(ex);
   }
 }
 
@@ -169,9 +168,9 @@ TEST(SessionHandlerTest, FUNC_ValidLogin) {
                 session_handler.session().passport->GetMaid().name());
     EXPECT_NO_THROW(Client(session_handler.session().passport->GetMaid(), bootstrap_contacts));
     LOG(kInfo) << "Client connection to account successful !";
-  } catch (std::exception& e) {
-    LOG(kError) << "Error on ValidLogin :" << boost::diagnostic_information(e);
-    ASSERT_TRUE(false);
+  }
+  catch (std::exception& e) {
+    GTEST_FAIL() << "Error on ValidLogin :" << boost::diagnostic_information(e);
   }
 }
 
@@ -187,11 +186,11 @@ TEST(SessionHandlerTest, FUNC_InvalidLogin) {
     authentication::UserCredentials user_credentials(MakeUserCredentials(user_credentials_tuple));
 
     // TODO(Prakash): Verify the error code being checked for as accurate
-    ExpectSpecificThrow([&] { session_handler.Login(std::move(user_credentials)); },
-                        MakeError(VaultErrors::no_such_account));
-  } catch (std::exception& e) {
-    LOG(kError) << "Error on InvalidLogin :" << boost::diagnostic_information(e);
-    ASSERT_TRUE(false);
+    EXPECT_TRUE(ThrowsAs([&] { session_handler.Login(std::move(user_credentials)); },
+                         VaultErrors::no_such_account));
+  }
+  catch (std::exception& e) {
+    GTEST_FAIL() << "Error on InvalidLogin :" << boost::diagnostic_information(e);
   }
 }
 
@@ -224,9 +223,9 @@ TEST(SessionHandlerTest, FUNC_Save) {
       session_handler.Save(client);
       LOG(kInfo) << "Save session successful !";
     }
-  } catch (std::exception& e) {
-    LOG(kError) << "Error on Login :" << boost::diagnostic_information(e);
-    ASSERT_TRUE(false);
+  }
+  catch (std::exception& e) {
+    GTEST_FAIL() << "Error on Login :" << boost::diagnostic_information(e);
   }
 }
 
