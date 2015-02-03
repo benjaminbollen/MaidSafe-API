@@ -28,7 +28,7 @@ namespace detail {
 
 namespace test {
 
-TEST(AccountGetterTest, FUNC_Constructor) {
+TEST(AccountGetterTest, NETWORK_Constructor) {
   auto account_getter_future = AccountGetter::CreateAccountGetter();
   LOG(kVerbose) << "Started CreateAccountGetter thread";
   std::unique_ptr<AccountGetter> account_getter;

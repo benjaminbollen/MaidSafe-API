@@ -36,7 +36,7 @@ namespace maidsafe {
 
 namespace test {
 
-TEST(PrivateClientTest, FUNC_CreateValidAccount) {
+TEST(PrivateClientTest, NETWORK_CreateValidAccount) {
   auto user_credentials_tuple(GetRandomUserCredentialsTuple());
   LOG(kInfo) << "PrivateClientTest  -- Creating new account --";
   std::future<std::unique_ptr<PrivateClient>> private_client_future{
@@ -48,7 +48,7 @@ TEST(PrivateClientTest, FUNC_CreateValidAccount) {
   private_client->Logout();
 }
 
-TEST(PrivateClientTest, FUNC_CreateMultipleAccounts) {
+TEST(PrivateClientTest, NETWORK_CreateMultipleAccounts) {
   const int kCount{ 10 };
   for (int i(0); i != kCount; ++i) {
     auto user_credentials_tuple(GetRandomUserCredentialsTuple());
@@ -63,7 +63,7 @@ TEST(PrivateClientTest, FUNC_CreateMultipleAccounts) {
   }
 }
 
-TEST(PrivateClientTest, FUNC_CreateDuplicateAccount) {
+TEST(PrivateClientTest, NETWORK_CreateDuplicateAccount) {
   auto user_credentials_tuple(GetRandomUserCredentialsTuple());
   {
     LOG(kInfo) << "PrivateClientTest  -- Creating First account --";
@@ -87,7 +87,7 @@ TEST(PrivateClientTest, FUNC_CreateDuplicateAccount) {
   }
 }
 
-TEST(PrivateClientTest, FUNC_ValidLogin) {
+TEST(PrivateClientTest, NETWORK_ValidLogin) {
   auto user_credentials_tuple(GetRandomUserCredentialsTuple());
   {
     LOG(kInfo) << "PrivateClientTest  -- Creating new account --";
@@ -111,7 +111,7 @@ TEST(PrivateClientTest, FUNC_ValidLogin) {
   }
 }
 
-TEST(PrivateClientTest, FUNC_InvalidLogin) {
+TEST(PrivateClientTest, NETWORK_InvalidLogin) {
   auto user_credentials_tuple(GetRandomUserCredentialsTuple());
   LOG(kInfo) << "PrivateClientTest  -- Login for invalid account --";
   std::unique_ptr<PrivateClient> private_client;

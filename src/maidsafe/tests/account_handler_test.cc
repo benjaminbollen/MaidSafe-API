@@ -33,7 +33,7 @@ namespace detail {
 
 namespace test {
 
-TEST(AccountHandlerTest, FUNC_Constructor) {
+TEST(AccountHandlerTest, NETWORK_Constructor) {
   LOG(kInfo) << "Account Handler for exisiting account";
   {
      AccountHandler{};
@@ -66,7 +66,7 @@ TEST(AccountHandlerTest, FUNC_EncryptDecryptAccount) {
   }
 }
 
-TEST(AccountHandlerTest, FUNC_Login) {
+TEST(AccountHandlerTest, NETWORK_Login) {
   auto user_credentials_tuple(GetRandomUserCredentialsTuple());
   auto maid_and_signer(passport::CreateMaidAndSigner());
   auto account_getter_future(AccountGetter::CreateAccountGetter());
@@ -95,7 +95,7 @@ TEST(AccountHandlerTest, FUNC_Login) {
   }
 }
 
-TEST(AccountHandlerTest, FUNC_Save) {
+TEST(AccountHandlerTest, NETWORK_Save) {
   auto user_credentials_tuple(GetRandomUserCredentialsTuple());
   auto maid_and_signer(passport::CreateMaidAndSigner());
   auto account_getter_future(AccountGetter::CreateAccountGetter());
